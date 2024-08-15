@@ -1,6 +1,6 @@
 {
-  "name": "open-southeners/packagist_package_here",
-  "description": "and_description_here",
+  "name": "open-southeners/extended-laravel",
+  "description": "Extended Laravel framework functionalities and out-of-the-box stuff",
   "license": "MIT",
   "keywords": [
     "open-southeners",
