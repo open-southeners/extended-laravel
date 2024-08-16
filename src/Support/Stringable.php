@@ -37,7 +37,7 @@ class Stringable
         /**
          * Get domain part from email address.
          */
-        return function (string $email): self {
+        return function (): self {
             $this->value = get_email_domain($this->value);
 
             return $this;
