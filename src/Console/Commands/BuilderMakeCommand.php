@@ -3,12 +3,12 @@
 namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 
 use App\Support\Skore;
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use OpenSoutheners\ExtendedLaravel\Console\FileGeneratorCommand;
 use ReflectionClass;
 use Symfony\Component\Console\Input\InputArgument;
 
-class BuilderMakeCommand extends GeneratorCommand
+class BuilderMakeCommand extends FileGeneratorCommand
 {
     /**
      * The console command name.
