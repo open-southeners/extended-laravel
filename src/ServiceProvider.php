@@ -44,7 +44,6 @@ class ServiceProvider extends BaseServiceProvider
             Commands\CheckVendorCommand::class,
             Commands\ClearLocksCacheCommand::class,
             Commands\FlushHorizonCommand::class,
-            Commands\HttpClientDocblockCommand::class,
         ]);
     }
 }
