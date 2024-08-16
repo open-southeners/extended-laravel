@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-08-16
+
+### Added
+
+- `OpensGeneratedFiles` console utility class that opens the generated files with the IDE configured (through `APP_IDE` environment variable)
+
+### Changed
+
+- All Laravel framework's commands that extends from `GeneratorCommand` now got replaced from the container using now `FileGeneratorCommand` (includes all `artisan make:` commands)
+
+### Fixed
+
+- `Stringable::emailDomain()` requiring an argument when none needed usable as `Str::of('joe@example.org')->emailDomain()->value()`
+
 ## [0.1.3] - 2024-08-16
 
 ### Fixed
