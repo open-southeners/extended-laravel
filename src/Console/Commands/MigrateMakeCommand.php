@@ -3,7 +3,7 @@
 namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand as BaseCommand;
-use OpenSoutheners\ExtendedLaravel\Console\OpensGeneratedFiles;
+use OpenSoutheners\ExtendedLaravel\Console\Concerns\OpensGeneratedFiles;
 
 class MigrateMakeCommand extends BaseCommand
 {

@@ -3,7 +3,7 @@
 namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 
 use Illuminate\Foundation\Console\ViewMakeCommand as BaseCommand;
-use OpenSoutheners\ExtendedLaravel\Console\OpensGeneratedFiles;
+use OpenSoutheners\ExtendedLaravel\Console\Concerns\OpensGeneratedFiles;
 
 class ViewMakeCommand extends BaseCommand
 {

@@ -3,7 +3,7 @@
 namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 
 use Illuminate\Foundation\Console\EnumMakeCommand as BaseCommand;
-use OpenSoutheners\ExtendedLaravel\Console\OpensGeneratedFiles;
+use OpenSoutheners\ExtendedLaravel\Console\Concerns\OpensGeneratedFiles;
 
 class EnumMakeCommand extends BaseCommand
 {

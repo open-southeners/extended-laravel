@@ -4,7 +4,7 @@ namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
-use OpenSoutheners\ExtendedLaravel\Console\OpensGeneratedFiles;
+use OpenSoutheners\ExtendedLaravel\Console\Concerns\OpensGeneratedFiles;
 use OpenSoutheners\ExtendedLaravel\Helpers;
 use ReflectionClass;
 use Symfony\Component\Console\Input\InputArgument;
