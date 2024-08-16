@@ -71,11 +71,12 @@ class ServiceProvider extends BaseServiceProvider
         \Illuminate\Events\Dispatcher::mixin(new \OpenSoutheners\ExtendedLaravel\Events\Dispatcher);
         \Illuminate\Validation\Rule::mixin(new \OpenSoutheners\ExtendedLaravel\Validation\Rule);
 
+        // Laravel replacements to get the modified with OpensGeneratedFiles trait
         $this->app->booted(function() {
 			Artisan::starting(function() {
-                // Laravel replacements to get them the OpensFile class
                 foreach ($this->overrides as $abstract => $override) {
                     $this->app->singleton($abstract, $override);
+                    $this->app->singleton(get_parent_class($override), $override);
                 }
             });
         });
