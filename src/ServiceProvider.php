@@ -2,12 +2,45 @@
 
 namespace OpenSoutheners\ExtendedLaravel;
 
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use OpenSoutheners\ExtendedLaravel\Console\Commands;
 
 class ServiceProvider extends BaseServiceProvider
 {
+    private array $overrides = [
+        'command.cast.make' => Commands\CastMakeCommand::class,
+        'command.channel.make' => Commands\ChannelMakeCommand::class,
+        'command.class.make' => Commands\ClassMakeCommand::class,
+        'command.console.make' => Commands\ConsoleMakeCommand::class,
+        'command.controller.make' => Commands\ControllerMakeCommand::class,
+        'command.enum.make' => Commands\EnumMakeCommand::class,
+        'command.event.make' => Commands\EventMakeCommand::class,
+        'command.exception.make' => Commands\ExceptionMakeCommand::class,
+        'command.factory.make' => Commands\FactoryMakeCommand::class,
+        'command.interface.make' => Commands\InterfaceMakeCommand::class,
+        'command.job.make' => Commands\JobMakeCommand::class,
+        'command.listener.make' => Commands\ListenerMakeCommand::class,
+        'command.mail.make' => Commands\MailMakeCommand::class,
+        'command.middleware.make' => Commands\MiddlewareMakeCommand::class,
+        MigrateMakeCommand::class => Commands\MigrateMakeCommand::class,
+        'command.model.make' => Commands\ModelMakeCommand::class,
+        'command.notification.make' => Commands\NotificationMakeCommand::class,
+        'command.observer.make' => Commands\ObserverMakeCommand::class,
+        'command.policy.make' => Commands\PolicyMakeCommand::class,
+        'command.provider.make' => Commands\ProviderMakeCommand::class,
+        'command.request.make' => Commands\RequestMakeCommand::class,
+        'command.resource.make' => Commands\ResourceMakeCommand::class,
+        'command.rule.make' => Commands\RuleMakeCommand::class,
+        'command.scope.make' => Commands\ScopeMakeCommand::class,
+        'command.seeder.make' => Commands\SeederMakeCommand::class,
+        'command.test.make' => Commands\TestMakeCommand::class,
+        'command.trait.make' => Commands\TraitMakeCommand::class,
+        'command.view.make' => Commands\ViewMakeCommand::class,
+    ];
+
     /**
      * Bootstrap any application services.
      *
@@ -38,37 +71,16 @@ class ServiceProvider extends BaseServiceProvider
         \Illuminate\Events\Dispatcher::mixin(new \OpenSoutheners\ExtendedLaravel\Events\Dispatcher);
         \Illuminate\Validation\Rule::mixin(new \OpenSoutheners\ExtendedLaravel\Validation\Rule);
 
-        $this->commands([
-            // Laravel replacements to get them the FileGeneratorCommand class
-            Commands\CastMakeCommand::class,
-            Commands\ChannelMakeCommand::class,
-            Commands\ClassMakeCommand::class,
-            Commands\ConsoleMakeCommand::class,
-            Commands\ControllerMakeCommand::class,
-            Commands\EnumMakeCommand::class,
-            Commands\EventMakeCommand::class,
-            Commands\ExceptionMakeCommand::class,
-            Commands\FactoryMakeCommand::class,
-            Commands\InterfaceMakeCommand::class,
-            Commands\JobMakeCommand::class,
-            Commands\ListenerMakeCommand::class,
-            Commands\MailMakeCommand::class,
-            Commands\MiddlewareMakeCommand::class,
-            Commands\MigrateMakeCommand::class,
-            Commands\ModelMakeCommand::class,
-            Commands\NotificationMakeCommand::class,
-            Commands\ObserverMakeCommand::class,
-            Commands\PolicyMakeCommand::class,
-            Commands\ProviderMakeCommand::class,
-            Commands\RequestMakeCommand::class,
-            Commands\ResourceMakeCommand::class,
-            Commands\RuleMakeCommand::class,
-            Commands\ScopeMakeCommand::class,
-            Commands\SeederMakeCommand::class,
-            Commands\TestMakeCommand::class,
-            Commands\TraitMakeCommand::class,
-            Commands\ViewMakeCommand::class,
+        $this->app->booted(function() {
+			Artisan::starting(function() {
+                // Laravel replacements to get them the OpensFile class
+                foreach ($this->overrides as $abstract => $override) {
+                    $this->app->singleton($abstract, $override);
+                }
+            });
+        });
 
+        $this->commands([
             Commands\BatchesQueueCommand::class,
             Commands\BuilderMakeCommand::class,
             Commands\CheckVendorCommand::class,
