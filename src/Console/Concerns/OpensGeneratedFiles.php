@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenSoutheners\ExtendedLaravel\Console;
+namespace OpenSoutheners\ExtendedLaravel\Console\Concerns;
 
 use Closure;
 
