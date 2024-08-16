@@ -2,14 +2,17 @@
 
 namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 
-use App\Support\Skore;
+use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
-use OpenSoutheners\ExtendedLaravel\Console\FileGeneratorCommand;
+use OpenSoutheners\ExtendedLaravel\Console\OpensGeneratedFiles;
+use OpenSoutheners\ExtendedLaravel\Helpers;
 use ReflectionClass;
 use Symfony\Component\Console\Input\InputArgument;
 
-class BuilderMakeCommand extends FileGeneratorCommand
+class BuilderMakeCommand extends GeneratorCommand
 {
+    use OpensGeneratedFiles;
+
     /**
      * The console command name.
      *
@@ -31,13 +34,22 @@ class BuilderMakeCommand extends FileGeneratorCommand
      */
     protected $type = 'Builder';
 
+    /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function handle()
     {
-        parent::handle();
+        return $this->openGeneratedAfter(function () {
+            parent::handle();
 
-        $this->writeModelBuilder();
+            $this->writeModelBuilder();
 
-        return true;
+            return true;
+        });
     }
 
     /**
@@ -49,7 +61,7 @@ class BuilderMakeCommand extends FileGeneratorCommand
     {
         $model = $this->argument('name');
 
-        $reflection = new ReflectionClass(Skore::getModelFrom($model));
+        $reflection = new ReflectionClass(Helpers::modelFrom($model));
 
         $modelFilePath = $reflection->getFileName();
 

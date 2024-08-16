@@ -2,25 +2,25 @@
 
 namespace OpenSoutheners\ExtendedLaravel\Console;
 
-use Illuminate\Console\GeneratorCommand;
+use Closure;
 
-abstract class FileGeneratorCommand extends GeneratorCommand
+/**
+ * @mixin \Illuminate\Console\GeneratorCommand
+ */
+trait OpensGeneratedFiles
 {
     /**
      * Execute the console command.
      *
-     * @return bool|null
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @return mixed
      */
-    public function handle()
+    public function openGeneratedAfter(Closure $callback)
     {
-        parent::handle();
-
-        $this->openWithIde(
+        return tap(call_user_func($callback), fn () => $this->openWithIde(
             $this->getPath(
                 $this->qualifyClass($this->getNameInput()),
             ),
-        );
+        ));
     }
 
     /**
@@ -55,6 +55,7 @@ abstract class FileGeneratorCommand extends GeneratorCommand
      *
      * @param  string  $path
      * @return string|false|void
+     *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \Psr\Container\ContainerExceptionInterface
@@ -63,20 +64,20 @@ abstract class FileGeneratorCommand extends GeneratorCommand
     {
         $openEditorUrl = $this->getEditorUrl(env('APP_IDE'));
 
-        if (!$openEditorUrl) {
+        if (! $openEditorUrl) {
             return;
         }
 
         if (windows_os()) {
-            return exec('explorer ' . str_replace('%path', $path, $openEditorUrl));
+            return exec('explorer '.str_replace('%path', $path, $openEditorUrl));
         }
 
         if (PHP_OS_FAMILY === 'Linux') {
-            return exec('xdg-open ' . str_replace('%path', $path, $openEditorUrl));
+            return exec('xdg-open '.str_replace('%path', $path, $openEditorUrl));
         }
 
         if (PHP_OS_FAMILY === 'Darwin') {
-            return exec('open ' . str_replace('%path', $path, $openEditorUrl));
+            return exec('open '.str_replace('%path', $path, $openEditorUrl));
         }
     }
 }
