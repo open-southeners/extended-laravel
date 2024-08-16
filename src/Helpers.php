@@ -13,10 +13,10 @@ use function OpenSoutheners\ExtendedPhp\Classes\class_from;
 class Helpers
 {
     /**
-    * Get model from class or string (by name).
-    *
-    * @return \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|null
-    */
+     * Get model from class or string (by name).
+     *
+     * @return \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|null
+     */
     public static function modelFrom(string $value, bool $asClass = true, string $namespace = 'App\Models\\')
     {
         $value = implode(
@@ -55,7 +55,6 @@ class Helpers
             && $classReflection->isSubclassOf('Illuminate\Database\Eloquent\Model');
     }
 
-
     /**
      * Get model instance from a mix-typed parameter.
      *
@@ -70,7 +69,7 @@ class Helpers
     public static function instanceFrom(mixed $key, string $class, array $columns = ['*'], array $with = [], bool $enforce = false)
     {
         if (! \class_exists($class) || ! static::isModel($class) || (\is_object($key) && ! static::isModel($key))) {
-            throw (new ModelNotFoundException())->setModel($class);
+            throw (new ModelNotFoundException)->setModel($class);
         }
 
         if (static::isModel($key) && $enforce) {
