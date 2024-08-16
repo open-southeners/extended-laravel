@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2024-08-16
+
+### Fixed
+
+- Registering commands that doesn't exists
+
 ## [0.1.0] - 2024-08-15
 
 ### Added
