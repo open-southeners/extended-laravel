@@ -47,10 +47,7 @@
   "autoload-dev": {
     "psr-4": {
       "OpenSoutheners\\ExtendedLaravel\\Tests\\": "tests"
-    },
-    "files": [
-      "src/Models/functions.php"
-    ]
+    }
   },
   "config": {
     "sort-packages": true
