@@ -4,6 +4,8 @@ namespace OpenSoutheners\ExtendedLaravel;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use ReflectionClass;
 use Throwable;
 
@@ -119,5 +121,24 @@ class Helpers
         }
 
         return false;
+    }
+
+    /**
+     * Get lock owner by key or false if lock not existing.
+     */
+    public static function getCacheLockOwner(string $key = '*'): array|string|false
+    {
+        $lockClient = Cache::lockConnection()->client();
+
+        if (Str::contains($key, '*')) {
+            return Str::replace(
+                // TODO: Is there any other way to get this from Cache, CacheManager, Lock or Redis?
+                config('database.redis.locks.prefix', '') . Cache::getPrefix(),
+                '',
+                $lockClient->keys(Cache::getPrefix() . $key),
+            );
+        }
+
+        return $lockClient->get(Cache::getPrefix() . $key);
     }
 }
