@@ -16,7 +16,7 @@ Add the following to your `bootstrap/app.php`
 
 <pre class="language-php"><code class="lang-php"><strong>->withMiddleware(function (Middleware $middleware) {
 </strong>    $middleware->append([
-        \App\Http\Middleware\ForceHttpsScheme::class,
+        \OpenSoutheners\ExtendedLaravel\Http\Middleware\ForceHttpsScheme::class,
     ]);
 })
 </code></pre>
@@ -34,7 +34,7 @@ Add the following to your `app/Http/Kernel.php`
  * @var array<int, class-string|string>
  */
 protected $middleware = [
-    \App\Http\Middleware\ForceHttpsScheme::class,
+    \OpenSoutheners\ExtendedLaravel\Http\Middleware\ForceHttpsScheme::class,
     // The rest of global middleware...
 ];
 ```
