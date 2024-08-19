@@ -2,75 +2,91 @@
 description: List of functions that works for Laravel Eloquent models.
 ---
 
-# Function helpers
+# Helpers
 
-This is the list of namespaced functions that you can import and use on your Laravel app.
+This is the list of functions that you can import and use on your Laravel app through the static methods of the `OpenSoutheners\ExtendedLaravel\Helpers` class.
 
-## model\_from
+## modelFrom
 
 Gets model fully qualified class or instanced object from given string.
 
 ```php
-\OpenSoutheners\ExtendedPhp\Models\model_from('post');
+Helpers::modelFrom('post');
 // 'App\Models\Post'
 
-\OpenSoutheners\ExtendedPhp\Models\model_from('post', false);
+Helpers::modelFrom('post', false);
 // object instance for App\Models\Post
 
-\OpenSoutheners\ExtendedPhp\Models\model_from('post', true, 'Domain\Posts');
+Helpers::modelFrom('post', true, 'Domain\Posts');
 // 'Domain\Posts\Post'
 ```
 
-## is\_model
+## isModel
 
 Checks if object or class is a Eloquent model.
 
 ```php
-\OpenSoutheners\ExtendedPhp\Models\is_model(App\Models\Post::class);
+Helpers::isModel(App\Models\Post::class);
 // true
 
-\OpenSoutheners\ExtendedPhp\Models\is_model(new App\Models\Post());
+Helpers::isModel(new App\Models\Post());
 // true
 ```
 
-## instance\_from
+## instanceFrom
 
 Creates a model instance from given key (generally its ID or specified primary key).
 
 ```php
-\OpenSoutheners\ExtendedPhp\Models\instance_from(1, App\Models\Post::class);
+Helpers::instanceFrom(1, App\Models\Post::class);
 // object instance for App\Models\Post with ID 1
 
-\OpenSoutheners\ExtendedPhp\Models\instance_from(1, App\Models\Post::class, ['id', 'title']);
+Helpers::instanceFrom(1, App\Models\Post::class, ['id', 'title']);
 // object instance for App\Models\Post with ID 1 and only selecting id and title columns
 
-\OpenSoutheners\ExtendedPhp\Models\instance_from(1, App\Models\Post::class, ['*'], ['author']);
+Helpers::instanceFrom(1, App\Models\Post::class, ['*'], ['author']);
 // object instance for App\Models\Post with ID 1 and with author relationship loaded
 ```
 
-## key\_from
+## keyFrom
 
 Tries to get Eloquent model key from given variable (can be of multiple types).
 
 ```php
-\OpenSoutheners\ExtendedPhp\Models\instance_from('1');
+Helpers::keyFrom('1');
 // 1
 
-\OpenSoutheners\ExtendedPhp\Models\instance_from('80b6dc25-8773-4639-abcf-ed1f157deea1');
+Helpers::keyFrom('80b6dc25-8773-4639-abcf-ed1f157deea1');
 // '80b6dc25-8773-4639-abcf-ed1f157deea1'
 
-\OpenSoutheners\ExtendedPhp\Models\instance_from(App\Models\Post::find(1));
+Helpers::keyFrom(App\Models\Post::find(1));
 // 1
 ```
 
-## query\_from
+## queryFrom
 
 Gets always a new Eloquent query builder instance from given model.
 
 ```php
-\OpenSoutheners\ExtendedPhp\Models\query_from(App\Models\Post::class);
+Helpers::queryFrom(App\Models\Post::class);
 // object instance for \Illuminate\Database\Eloquent\Builder
 
-\OpenSoutheners\ExtendedPhp\Models\query_from(App\Models\Post::query()->where('title', 'hello'));
+Helpers::queryFrom(App\Models\Post::query()->where('title', 'hello'));
 // new object instance for \Illuminate\Database\Eloquent\Builder
+```
+
+## getCacheLockOwner
+
+Get cache atomic locks owner or false otherwise if no lock found.
+
+```php
+Cache::lock('podcasts.1.upload')->get();
+
+Helpers::getCacheLockOwner('podcasts.1.upload');
+// 432afra2pjna
+
+Cache::lock('podcasts.2.upload')->get();
+
+Helpers::getCacheLockOwner('podcasts.*');
+// ['podcasts.1.upload', 'podcasts.2.upload']
 ```

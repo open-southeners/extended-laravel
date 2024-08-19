@@ -1,4 +1,6 @@
 # Table of contents
 
 * [Getting started](README.md)
-* [Function helpers](function-helpers.md)
+* [Helpers](function-helpers.md)
+* [Commands](commands.md)
+* [Middleware](middleware.md)
