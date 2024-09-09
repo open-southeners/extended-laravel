@@ -25,7 +25,6 @@ class ServiceProvider extends BaseServiceProvider
         'command.listener.make' => Commands\ListenerMakeCommand::class,
         'command.mail.make' => Commands\MailMakeCommand::class,
         'command.middleware.make' => Commands\MiddlewareMakeCommand::class,
-        MigrateMakeCommand::class => Commands\MigrateMakeCommand::class,
         'command.model.make' => Commands\ModelMakeCommand::class,
         'command.notification.make' => Commands\NotificationMakeCommand::class,
         'command.observer.make' => Commands\ObserverMakeCommand::class,
@@ -74,6 +73,10 @@ class ServiceProvider extends BaseServiceProvider
         // Laravel replacements to get the modified with OpensGeneratedFiles trait
         $this->app->booted(function() {
 			Artisan::starting(function() {
+                $this->app->singleton(MigrateMakeCommand::class, function($app) {
+                    return new Commands\MigrateMakeCommand($app['migration.creator'], $app['composer']);
+                });
+
                 foreach ($this->overrides as $abstract => $override) {
                     $this->app->singleton($abstract, $override);
                     $this->app->singleton(get_parent_class($override), $override);

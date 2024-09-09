@@ -9,21 +9,31 @@ class MigrateMakeCommand extends BaseCommand
 {
     use OpensGeneratedFiles;
 
+    protected ?string $migrationOutputPath = null;
+
     public function handle()
     {
-        $this->openGeneratedAfter(fn () => parent::handle());
+        $this->openGeneratedAfter(function () {
+            $this->creator->afterCreate(function (?string $table = null, ?string $path = null) {
+                $this->migrationOutputPath = $path;
+            });
+
+            parent::handle();
+        });
     }
 
-    /**
-     * Resolve the fully-qualified path to the stub.
-     *
-     * @param  string  $stub
-     * @return string
-     */
-    protected function resolveStubPath($stub)
+    protected function getPath(string $input): string
     {
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : dirname((new \ReflectionClass(BaseCommand::class))->getFileName()).$stub;
+        return $input;
+    }
+
+    protected function qualifyClass(string $input): string
+    {
+        return $input;
+    }
+
+    protected function getNameInput(): string
+    {
+        return $this->migrationOutputPath;
     }
 }
