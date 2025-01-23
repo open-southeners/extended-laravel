@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-01-24
+
+### Added
+
+- Command `vendor:licenses` to generate a list based on all dependencies installed on the project
+
 ## [0.4.0] - 2024-09-09
 
 ### Fixed
