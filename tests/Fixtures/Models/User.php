@@ -11,7 +11,7 @@ class User extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['id'];
+    protected $fillable = ['id', 'name', 'email'];
 
     /**
      * Get post that user owns.

@@ -21,7 +21,7 @@ class Arr
          *
          * @param  array|string  $values
          */
-        return fn (array $array, $values): array => array_filter($array, fn ($value) => in_array($value, !static::wrap($values)));
+        return fn (array $array, $values): array => array_filter($array, fn ($value) => !in_array($value, static::wrap($values)));
     }
 
     public function onlyValues(): Closure
@@ -34,7 +34,7 @@ class Arr
         return fn (array $array, $values): array => array_filter($array, fn ($value) => in_array($value, static::wrap($values)));
     }
 
-    public function query(): Closure
+    public function queryString(): Closure
     {
         /**
          * Convert the array into a query string.

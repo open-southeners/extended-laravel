@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\Instanceof_;
 
 /**
  * This is NOT supposed to be used alone, use the main from Laravel framework
@@ -23,9 +24,15 @@ class Collection
         return function (): string {
             $csvContent = '';
 
-            $csvContent .= implode(',', array_keys((array) $this->first()))."\n";
+            $headers = $this->flatMap(fn ($item) => array_keys($item instanceof Arrayable ? $item->toArray() : (array) $item))->unique();
 
-            $csvContent .= implode("\n", $this->map(fn ($result) => implode(',', array_values((array) $result)))->toArray());
+            $csvContent .= implode(',', $headers->toArray())."\n";
+
+            $csvContent .= implode("\n", $this->map(function ($result) use ($headers): string {
+                $resultAsArray = $result instanceof Arrayable ? $result->toArray() : (array) $result;
+
+                return $headers->map(fn (string $header): string => $resultAsArray[$header] ?? '')->join(',');
+            })->toArray());
 
             return $csvContent;
         };
