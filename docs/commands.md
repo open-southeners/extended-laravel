@@ -59,3 +59,19 @@ Check and list all the config and publishable group that is outdated on your app
 ```bash
 php artisan vendor:check
 ```
+
+### Get dependencies licenses list
+
+Gets licenses list from backend and frontend dependencies (using NPM).
+
+```sh
+php artisan vendor:licenses
+```
+
+You can get Markdown or JSON formatted list by using the option `--format`
+
+```bash
+php artisan vendor:licenses --format=markdown
+
+php artisan vendor:licenses --format=json
+```

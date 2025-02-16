@@ -4,3 +4,4 @@
 * [Helpers](function-helpers.md)
 * [Commands](commands.md)
 * [Middleware](middleware.md)
+* [Facades](facades.md)
