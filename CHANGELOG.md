@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `Collection::templateJoin` macro
+- `Number::toByteUnit` macro
 
 ## [0.5.0] - 2025-01-24
 
