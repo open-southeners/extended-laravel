@@ -14,9 +14,6 @@ jobs:
         stability: [prefer-stable]
         laravel: [10.*, 11.*]
         include:
-          - php: 8.3
-            coverage: true
-
           - laravel: 10.*
             testbench: 8.*
 
@@ -59,9 +56,8 @@ jobs:
 
       - name: 🚀 Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
-        if: contains(${{ matrix.coverage }}, true)
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./clover.xml
           fail_ci_if_error: true
-          verbose: true
+          # verbose: true
