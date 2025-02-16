@@ -21,7 +21,7 @@ class Arr
          *
          * @param  array|string  $values
          */
-        return fn (array $array, $values): array => array_flip(static::except(array_flip($array), $values));
+        return fn (array $array, $values): array => array_filter($array, fn ($value) => in_array($value, !static::wrap($values)));
     }
 
     public function onlyValues(): Closure
@@ -31,7 +31,7 @@ class Arr
          *
          * @param  array|string  $values
          */
-        return fn (array $array, $values): array => array_flip(static::only(array_flip($array), $values));
+        return fn (array $array, $values): array => array_filter($array, fn ($value) => in_array($value, static::wrap($values)));
     }
 
     public function query(): Closure
