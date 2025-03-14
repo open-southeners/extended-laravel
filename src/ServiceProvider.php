@@ -7,6 +7,8 @@ use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use OpenSoutheners\ExtendedLaravel\Console\Commands;
+use OpenSoutheners\ExtendedLaravel\Events;
+use OpenSoutheners\ExtendedLaravel\Listeners;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -51,7 +53,12 @@ class ServiceProvider extends BaseServiceProvider
 
         Event::listen(
             \Illuminate\Foundation\Events\PublishingStubs::class,
-            \OpenSoutheners\ExtendedLaravel\Listeners\RegisterStubs::class
+            Listeners\RegisterStubs::class
+        );
+
+        Event::listen(
+            Events\CommandFileGenerated::class,
+            Listeners\OpenUserPreferredEditor::class
         );
     }
 

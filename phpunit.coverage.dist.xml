@@ -1,29 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
-  bootstrap="vendor/autoload.php"
-  backupGlobals="false"
-  colors="true"
-  stopOnFailure="false"
-  cacheDirectory=".phpunit.cache"
-  backupStaticProperties="false"
->
-  <coverage>
-    <include>
-      <directory suffix=".php">src</directory>
-    </include>
-    <report>
-      <clover outputFile="clover.xml"/>
-    </report>
-  </coverage>
-  <testsuites>
-    <testsuite name="Package Test Suite">
-      <directory>tests</directory>
-    </testsuite>
-  </testsuites>
-  <php>
-    <ini name="memory_limit" value="2048M"/>
-    <env name="DB_CONNECTION" value="sqlite" force="true"/>
-    <env name="DB_DATABASE" value=":memory:" force="true"/>
-  </php>
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="depends,defects"
+         requireCoverageMetadata="false"
+         beStrictAboutCoverageMetadata="false"
+         beStrictAboutOutputDuringTests="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         failOnPhpunitDeprecation="true"
+         failOnRisky="true"
+         failOnWarning="true">
+    <coverage includeUncoveredFiles="false"
+            pathCoverage="false"
+            ignoreDeprecatedCodeUnits="true"
+            disableCodeCoverageIgnore="false">
+        <report>
+            <clover outputFile="clover.xml"/>
+        </report>
+    </coverage>
+
+    <testsuites>
+        <testsuite name="Package Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
+        <include>
+            <directory>src</directory>
+        </include>
+
+        <exclude>
+            <file>src/Console/Commands/BuilderMakeCommand.php</file>
+            <file>src/Console/Commands/CastMakeCommand.php</file>
+            <file>src/Console/Commands/ChannelMakeCommand.php</file>
+            <file>src/Console/Commands/ConsoleMakeCommand.php</file>
+            <file>src/Console/Commands/ControllerMakeCommand.php</file>
+            <file>src/Console/Commands/EnumMakeCommand.php</file>
+            <file>src/Console/Commands/EventMakeCommand.php</file>
+            <file>src/Console/Commands/ExceptionMakeCommand.php</file>
+            <file>src/Console/Commands/FactoryMakeCommand.php</file>
+            <file>src/Console/Commands/InterfaceMakeCommand.php</file>
+            <file>src/Console/Commands/JobMakeCommand.php</file>
+            <file>src/Console/Commands/ListenerMakeCommand.php</file>
+            <file>src/Console/Commands/MailMakeCommand.php</file>
+            <file>src/Console/Commands/MiddlewareMakeCommand.php</file>
+            <file>src/Console/Commands/MigrateMakeCommand.php</file>
+            <file>src/Console/Commands/ModelMakeCommand.php</file>
+            <file>src/Console/Commands/NotificationMakeCommand.php</file>
+            <file>src/Console/Commands/ObserverMakeCommand.php</file>
+            <file>src/Console/Commands/PolicyMakeCommand.php</file>
+            <file>src/Console/Commands/ProviderMakeCommand.php</file>
+            <file>src/Console/Commands/RequestMakeCommand.php</file>
+            <file>src/Console/Commands/ResourceMakeCommand.php</file>
+            <file>src/Console/Commands/RuleMakeCommand.php</file>
+            <file>src/Console/Commands/ScopeMakeCommand.php</file>
+            <file>src/Console/Commands/SeederMakeCommand.php</file>
+            <file>src/Console/Commands/TestMakeCommand.php</file>
+            <file>src/Console/Commands/TraitMakeCommand.php</file>
+            <file>src/Console/Commands/ViewMakeCommand.php</file>
+            <file>src/Console/Commands/FlushHorizonCommand.php</file>
+            <file>src/AboutCommandIntegration.php</file>
+            <directory>src/Listeners</directory>
+        </exclude>
+    </source>
+
+    <php>
+        <ini name="memory_limit" value="2048M"/>
+        <env name="DB_CONNECTION" value="testing"/>
+    </php>
 </phpunit>

@@ -1,62 +1,83 @@
 {
-  "name": "open-southeners/extended-laravel",
-  "description": "Extended Laravel framework functionalities and out-of-the-box stuff",
-  "license": "MIT",
-  "keywords": [
-    "open-southeners",
-    "laravel",
-    "utilities",
-    "php8",
-    "php"
-  ],
-  "authors": [
-    {
-      "name": "Ruben Robles",
-      "email": "me@d8vjork.com",
-      "homepage": "https://d8vjork.com"
+    "name": "open-southeners/extended-laravel",
+    "description": "Extended Laravel framework functionalities and out-of-the-box stuff",
+    "license": "MIT",
+    "keywords": [
+        "open-southeners",
+        "laravel",
+        "utilities",
+        "php8",
+        "php"
+    ],
+    "authors": [
+        {
+            "name": "Ruben Robles",
+            "email": "me@d8vjork.com",
+            "homepage": "https://d8vjork.com"
+        }
+    ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/open-southeners"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "open-southeners/byte-unit-converter": "^3.0",
+        "open-southeners/extended-php": "^1.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^2.0",
+        "laravel/cashier": "^15.0",
+        "laravel/passport": "^12.0",
+        "laravel/pint": "^1.5",
+        "laravel/socialite": "^5.0",
+        "orchestra/testbench": "^8.0 || ^9.0",
+        "phpstan/phpstan": "^1.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "OpenSoutheners\\ExtendedLaravel\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OpenSoutheners\\ExtendedLaravel\\Tests\\": "tests",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "OpenSoutheners\\ExtendedLaravel\\ServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "@php vendor/bin/pint --ansi",
+            "@php vendor/bin/phpstan analyse --verbose --ansi"
+        ]
     }
-  ],
-  "funding": [
-    {
-      "type": "github",
-      "url": "https://github.com/sponsors/open-southeners"
-    }
-  ],
-  "require": {
-    "php": "^8.1",
-    "open-southeners/byte-unit-converter": "^3.0",
-    "open-southeners/extended-php": "^1.0"
-  },
-  "require-dev": {
-    "larastan/larastan": "^2.0",
-    "laravel/cashier": "^15.0",
-    "laravel/passport": "^12.0",
-    "laravel/pint": "^1.5",
-    "laravel/socialite": "^5.0",
-    "orchestra/testbench": "^8.0 || ^9.0",
-    "phpstan/phpstan": "^1.0",
-    "phpunit/phpunit": "^10.0"
-  },
-  "minimum-stability": "stable",
-  "prefer-stable": true,
-  "autoload": {
-    "psr-4": {
-      "OpenSoutheners\\ExtendedLaravel\\": "src"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "OpenSoutheners\\ExtendedLaravel\\Tests\\": "tests"
-    }
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "OpenSoutheners\\ExtendedLaravel\\ServiceProvider"
-      ]
-    }
-  }
 }

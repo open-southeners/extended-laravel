@@ -16,3 +16,6 @@ trim_trailing_whitespace = false
 
 [*.{yml,xml}]
 indent_size = 2
+
+[phpunit*.xml]
+indent_size = 4

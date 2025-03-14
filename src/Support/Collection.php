@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use PhpParser\Node\Expr\Instanceof_;
 
 /**
  * This is NOT supposed to be used alone, use the main from Laravel framework

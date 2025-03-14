@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models;
+namespace Workbench\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

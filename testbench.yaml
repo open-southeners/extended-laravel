@@ -1,0 +1,20 @@
+providers:
+    - OpenSoutheners\ExtendedLaravel\ServiceProvider
+    - Workbench\App\Providers\AppServiceProvider
+
+migrations:
+    - workbench/database/migrations
+
+workbench:
+    start: "/"
+    install: true
+    health: false
+    discovers:
+        web: false
+        api: false
+        commands: true
+        components: false
+        views: false
+    build: []
+    assets: []
+    sync: []

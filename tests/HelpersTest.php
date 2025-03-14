@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Mockery as m;
 use OpenSoutheners\ExtendedLaravel\Helpers;
-use OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\Post;
-use OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\User;
-use OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\UuidModel;
+use Workbench\App\Models\Post;
+use Workbench\App\Models\User;
+use Workbench\App\Models\UuidModel;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -22,9 +22,9 @@ class HelpersTest extends TestCase
 {
     public function test_model_from(): void
     {
-        $this->assertIsString(Helpers::modelFrom('Post', true, 'OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\\'));
-        $this->assertIsString(Helpers::modelFrom('post', true, 'OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\\'));
-        $this->assertTrue(Helpers::modelFrom('post', false, 'OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\\') instanceof Post);
+        $this->assertIsString(Helpers::modelFrom('Post', true, 'Workbench\App\Models\\'));
+        $this->assertIsString(Helpers::modelFrom('post', true, 'Workbench\App\Models\\'));
+        $this->assertTrue(Helpers::modelFrom('post', false, 'Workbench\App\Models\\') instanceof Post);
     }
 
     public function test_is_model(): void

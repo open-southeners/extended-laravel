@@ -5,6 +5,7 @@ namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ClearLocksCacheCommand extends Command
 {
@@ -33,7 +34,11 @@ class ClearLocksCacheCommand extends Command
             return 1;
         }
 
-        Cache::lockConnection()->flushDb();
+        match (config('cache.default')) {
+            'redis' => Cache::lockConnection()->flushDb(),
+            'database' => DB::table('cache_locks')->truncate(),
+            default => null,
+        };
 
         $this->info('Cache locks cleared successfully!');
 

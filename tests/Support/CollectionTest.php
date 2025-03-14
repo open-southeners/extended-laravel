@@ -3,8 +3,8 @@
 namespace OpenSoutheners\ExtendedLaravel\Tests\Support;
 
 use Illuminate\Support\Collection;
-use OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\Post;
-use OpenSoutheners\ExtendedLaravel\Tests\Fixtures\Models\User;
+use Workbench\App\Models\Post;
+use Workbench\App\Models\User;
 use OpenSoutheners\ExtendedLaravel\Tests\TestCase;
 
 class CollectionTest extends TestCase

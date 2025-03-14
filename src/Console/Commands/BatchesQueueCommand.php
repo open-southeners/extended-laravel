@@ -38,7 +38,7 @@ class BatchesQueueCommand extends Command
                 ->map(function (\stdClass $jobBatch) {
                     $jobBatch = (array) $jobBatch;
 
-                    $jobBatch['total_jobs'] = sprintf('%d%%', $jobBatch['pending_jobs'] / $jobBatch['total_jobs'] * 100);
+                    $jobBatch['total_jobs'] = sprintf('%d%%', ($jobBatch['total_jobs']-$jobBatch['pending_jobs']) / $jobBatch['total_jobs'] * 100);
 
                     unset($jobBatch['pending_jobs']);
 

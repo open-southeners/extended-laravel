@@ -17,6 +17,7 @@ class ClassMakeCommand extends BaseCommand
     /**
      * Resolve the fully-qualified path to the stub.
      *
+     * @codeCoverageIgnore
      * @param  string  $stub
      * @return string
      */
