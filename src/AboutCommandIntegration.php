@@ -11,22 +11,24 @@ use Laravel\Socialite\Contracts\Factory;
 use ReflectionClass;
 use Stripe\Stripe;
 
-class AboutCommandIntegration
+final class AboutCommandIntegration
 {
+    /**
+     * @return void
+     */
     public static function register()
     {
-        if (! class_exists(AboutCommand::class)) {
-            return;
+        if (class_exists(AboutCommand::class)) {
+            (new static)
+                ->printExtendedDriversInfo()
+                ->printIntegrationsInfo()
+                ->printCashierInfo();
         }
-
-        (new static)
-            ->printExtendedDriversInfo()
-            ->printIntegrationsInfo()
-            ->printCashierInfo();
     }
 
     private function getUserConfigured(string $variable, string $value): string
     {
+        /** @phpstan-ignore larastan.noEnvCallsOutsideOfConfig */
         $userConfiguredValue = env($variable);
 
         if (! empty($userConfiguredValue)) {
@@ -49,20 +51,6 @@ class AboutCommandIntegration
     {
         AboutCommand::add('Integrations', function (): array {
             $integrations = [];
-
-            if (class_exists(Factory::class)) {
-                $socialiteManager = app(Factory::class);
-
-                $providers = array_keys((new ReflectionClass($socialiteManager))
-                    ->getProperty('customCreators')
-                    ->getValue($socialiteManager));
-
-                $integrations['Socialite'] = sprintf(
-                    '%s %s',
-                    ! empty($providers) ? '<fg=green;options=bold>YES</>' : '<fg=yellow;options=bold>NO</>',
-                    ! empty($providers) ? Str::wrap(implode(', ', $providers), '(', ')') : ''
-                );
-            }
 
             if (class_exists(Passport::class)) {
                 $integrations['Passport'] = (
