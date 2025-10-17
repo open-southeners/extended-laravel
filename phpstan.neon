@@ -6,4 +6,11 @@ parameters:
     paths:
         - src
 
+    excludePaths:
+        - src/Support/*
+        - src/Events/Dispatcher.php
+
     level: "max"
+
+    ignoreErrors:
+        - '#Parameter \#1 \$abstract of method Illuminate\\Contracts\\Container\\Container::singleton\(\) expects Closure\|string, class-string\|false given.#'

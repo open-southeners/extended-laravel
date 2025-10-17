@@ -33,7 +33,10 @@ class FlushHorizonCommand extends Command
             return 1;
         }
 
-        Redis::connection('horizon')->client()->flushAll();
+        /** @var \Redis $redisClient */
+        $redisClient = Redis::connection('horizon')->client();
+
+        $redisClient->flushAll();
 
         $this->info('The command was successful!');
 

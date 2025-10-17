@@ -54,7 +54,7 @@ final class AboutCommandIntegration
 
             if (class_exists(Passport::class)) {
                 $integrations['Passport'] = (
-                    ! empty(env('PASSPORT_PRIVATE_KEY')) && ! empty(env('PASSPORT_PUBLIC_KEY'))
+                    ! empty(config('passport.private_key')) && ! empty(config('passport.public_key'))
                     || (Passport::keyPath('oauth-public.key') && Passport::keyPath('oauth-private.key')
                     )) ? '<fg=green;options=bold>YES</>' : '<fg=yellow;options=bold>NO</>';
             }

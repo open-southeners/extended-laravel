@@ -9,6 +9,9 @@ class ViewMakeCommand extends BaseCommand
 {
     use OpensGeneratedFiles;
 
+    /**
+     * @return bool|null
+     */
     public function handle()
     {
         return $this->openGeneratedAfter(fn () => parent::handle());
@@ -24,6 +27,6 @@ class ViewMakeCommand extends BaseCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : dirname((new \ReflectionClass(BaseCommand::class))->getFileName()).$stub;
+            : dirname((new \ReflectionClass(BaseCommand::class))->getFileName() ?: '').$stub;
     }
 }

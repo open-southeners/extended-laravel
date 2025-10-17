@@ -19,7 +19,10 @@ class Arr
         /**
          * Get all of the given array except for a specified array of values.
          *
-         * @param  array|string  $values
+         * @template T
+         * @param  array<T>  $values
+         * @param  array<T>|T  $values
+         * @return array<T>
          */
         return fn (array $array, $values): array => array_filter($array, fn ($value) => !in_array($value, static::wrap($values)));
     }
@@ -29,7 +32,10 @@ class Arr
         /**
          * Get a subset of the items from the given array.
          *
-         * @param  array|string  $values
+         * @template T
+         * @param  array<T>  $values
+         * @param  array<T>|T  $values
+         * @return array<T>
          */
         return fn (array $array, $values): array => array_filter($array, fn ($value) => in_array($value, static::wrap($values)));
     }

@@ -8,6 +8,7 @@ use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Process;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class LicensesVendorCommand extends Command
 {
@@ -58,6 +59,10 @@ class LicensesVendorCommand extends Command
         return 0;
     }
 
+    /**
+     * @param array<string> $headings
+     * @param Collection<int, array{'Component': string, 'License': string}> $data
+     */
     protected function displayAsMarkdown(array $headings, Collection $data): void
     {
         $formattedHeadings = array_map(fn (string $heading) => Str::wrap($heading, " "), $headings);
@@ -65,12 +70,12 @@ class LicensesVendorCommand extends Command
         $markdown = Str::wrap(Arr::join($formattedHeadings, '|'), '|')."\n";
 
         $markdown .= Str::wrap(
-          Collection::make()
-              ->range(0, count($formattedHeadings)-1)
-              ->map(fn (int $n) => Str::wrap(str_repeat('-', strlen($formattedHeadings[$n])), ' '))
-              ->join('|'),
-          '|',
-          '|'
+            Collection::make()
+                ->range(0, count($formattedHeadings)-1)
+                ->map(fn (int $n) => Str::wrap(str_repeat('-', strlen($formattedHeadings[$n])), ' '))
+                ->join('|'),
+            '|',
+            '|'
         )."\n";
 
         $data->each(function (array $item) use (&$markdown) {
@@ -80,6 +85,12 @@ class LicensesVendorCommand extends Command
         $this->line($markdown);
     }
 
+    /**
+     * Fetches the dependencies of the NodeJS side.
+     *
+     * @return Collection<int, array{'Component': string, 'License': string}>
+     * @throws InvalidArgumentException
+     */
     protected function fetchNodeDependencies(): Collection
     {
         $command = ['npx', 'license-report'];
@@ -90,11 +101,20 @@ class LicensesVendorCommand extends Command
 
         $result = Process::run(implode(' ', $command));
 
-        return Collection::make(json_decode($result->output(), true))
+        /** @var array<array{'name': string, 'licenseType': string}>|bool|null $parsedResult */
+        $parsedResult = json_decode($result->output(), true);
+
+        return Collection::make(is_array($parsedResult) ? $parsedResult : [])
             ->map(fn(array $dependency) => ['Component' => $dependency['name'], 'License' => $dependency['licenseType']])
             ->values();
     }
 
+    /**
+     * Fetches the dependencies of the PHP side.
+     *
+     * @return Collection<int, array{'Component': string, 'License': string}>
+     * @throws InvalidArgumentException
+     */
     protected function fetchComposerDependencies(): Collection
     {
         $command = $this->composer->findComposer();
@@ -108,7 +128,10 @@ class LicensesVendorCommand extends Command
 
         $result = Process::run(implode(' ', $command));
 
-        return Collection::make(json_decode($result->output(), true)['dependencies'])
+        /** @var array{'dependencies': array<string, array{'license': array<string>}>}|bool|null $parsedResult */
+        $parsedResult = json_decode($result->output(), true);
+
+        return Collection::make(is_array($parsedResult) ? $parsedResult['dependencies'] : [])
             ->map(fn(array $dependency, string $name) => ['Component' => $name, 'License' => implode(', ', $dependency['license'])])
             ->values();
     }

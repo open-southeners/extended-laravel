@@ -21,7 +21,7 @@ class Stringable
         /**
          * Parse a url query string into an array.
          */
-        return fn (): array => parse_http_query($this->value);
+        return fn (): array =>  parse_http_query($this->value);
     }
 
     public function isJsonStructure(): Closure

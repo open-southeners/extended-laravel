@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use OpenSoutheners\ByteUnitConverter\ByteUnitConverter;
 
 /**
- * @implements \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\OpenSoutheners\ByteUnitConverter\ByteUnitConverter, int>
+ * @implements \Illuminate\Contracts\Database\Eloquent\CastsAttributes<string, string>
  */
 class ByteUnit implements CastsAttributes
 {
     /**
      * Cast the given value.
      *
+     * @param  int|string|null  $value
      * @param  array<string, mixed>  $attributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed

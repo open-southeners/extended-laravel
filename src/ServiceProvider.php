@@ -4,6 +4,7 @@ namespace OpenSoutheners\ExtendedLaravel;
 
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use OpenSoutheners\ExtendedLaravel\Console\Commands;
@@ -12,6 +13,9 @@ use OpenSoutheners\ExtendedLaravel\Listeners;
 
 class ServiceProvider extends BaseServiceProvider
 {
+    /**
+     * @var array<string, class-string<\Illuminate\Console\GeneratorCommand>>
+     */
     private array $overrides = [
         'command.cast.make' => Commands\CastMakeCommand::class,
         'command.channel.make' => Commands\ChannelMakeCommand::class,
@@ -81,7 +85,7 @@ class ServiceProvider extends BaseServiceProvider
         // Laravel replacements to get the modified with OpensGeneratedFiles trait
         $this->app->booted(function() {
 			Artisan::starting(function() {
-                $this->app->singleton(MigrateMakeCommand::class, function($app) {
+                $this->app->singleton(MigrateMakeCommand::class, function(Application $app) {
                     return new Commands\MigrateMakeCommand($app['migration.creator'], $app['composer']);
                 });
 

@@ -13,7 +13,9 @@ trait OpensGeneratedFiles
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @template T
+     * @param \Closure(): (T) $callback
+     * @return T
      */
     public function openGeneratedAfter(Closure $callback)
     {

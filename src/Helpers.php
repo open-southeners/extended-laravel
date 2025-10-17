@@ -3,10 +3,13 @@
 namespace OpenSoutheners\ExtendedLaravel;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use Spatie\StructureDiscoverer\Data\DiscoveredClass;
+use Spatie\StructureDiscoverer\Discover;
 use Throwable;
 
 use function OpenSoutheners\ExtendedPhp\Classes\call;
@@ -17,29 +20,36 @@ class Helpers
     /**
      * Get model from class or string (by name).
      *
+     * @param array<string>|null $paths
      * @return \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|null
      */
-    public static function modelFrom(string $value, bool $asClass = true, string $namespace = 'App\Models\\')
+    public static function modelFrom(string $value, bool $asClass = true, ?array $paths = null)
     {
-        $value = implode(
-            array_map(fn ($word) => ucfirst($word), explode(' ', str_replace(['-', '_'], ' ', $value)))
-        );
+        $paths ??= [app_path('Models')];
 
-        $modelClass = $namespace.class_basename($value);
+        /** @var array<class-string<\Illuminate\Database\Eloquent\Model>> */
+        $discoveredClasses = Discover::in(...$paths)
+            ->classes()
+            ->custom(fn(DiscoveredClass $structure) => mb_strtolower($structure->name) === mb_strtolower($value))
+            ->get();
 
-        $modelClass = class_exists(class_from($modelClass)) ? $modelClass : null;
+        $firstFoundClass = $discoveredClasses[0] ?? null;
 
-        if (! $asClass && $modelClass !== null) {
-            return new $modelClass;
+        if (!$firstFoundClass || ($firstFoundClass && (new ReflectionClass($firstFoundClass))->isAbstract())) {
+            return null;
         }
 
-        return $modelClass;
+        if (!$asClass) {
+            return new $firstFoundClass;
+        }
+
+        return $firstFoundClass;
     }
 
     /**
      * Check if object or class string is a valid Laravel model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|object|string  $class
+     * @param  \Illuminate\Database\Eloquent\Model|object|class-string  $class
      */
     public static function isModel(mixed $class): bool
     {

@@ -32,8 +32,8 @@ class BatchesQueueCommand extends Command
 
         $this->table(
             Arr::exceptValues($columns, ['total_jobs', 'pending_jobs']),
-            DB::connection(config('queue.batching.database'))
-                ->table(config('queue.batching.table', 'job_batches'))
+            DB::connection(config()->string('queue.batching.database', 'sqlite'))
+                ->table(config()->string('queue.batching.table', 'job_batches'))
                 ->get(Arr::exceptValues($columns, ['completion']))
                 ->map(function (\stdClass $jobBatch) {
                     $jobBatch = (array) $jobBatch;

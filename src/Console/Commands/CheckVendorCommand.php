@@ -26,7 +26,7 @@ class CheckVendorCommand extends Command
     protected $description = 'Check vendor dependencies in search of local outdated dependencies';
 
     /**
-     * @var \Illuminate\Filesystem\FilesystemAdapter
+     * @var \Illuminate\Contracts\Filesystem\Filesystem
      */
     protected $filesystem;
 
@@ -55,7 +55,7 @@ class CheckVendorCommand extends Command
                 $originFiles = $this->filesystem->allFiles(str_replace(trim(base_path(' ')), '', $origin));
 
                 foreach ($originFiles as $file) {
-                    $publishablesArr[] = $this->getFileDiff($file, base_path(last(explode($origin, (string) $file))));
+                    $publishablesArr[] = $this->getFileDiff($file, base_path(last(explode($origin, $file))));
                 }
             } else {
                 $publishablesArr[] = $this->getFileDiff($origin, $destination);

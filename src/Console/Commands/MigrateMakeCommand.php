@@ -34,6 +34,6 @@ class MigrateMakeCommand extends BaseCommand
 
     protected function getNameInput(): string
     {
-        return $this->migrationOutputPath;
+        return $this->migrationOutputPath ?? '';
     }
 }

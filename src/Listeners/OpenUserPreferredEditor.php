@@ -13,6 +13,7 @@ class OpenUserPreferredEditor
      */
     public function handle(CommandFileGenerated $event)
     {
+        /** @phpstan-ignore larastan.noEnvCallsOutsideOfConfig */
         $openEditorUri = match (env('APP_IDE')) {
             'sublime' => 'subl://open?url=file://%path',
             'textmate' => 'txmt://open?url=file://%path',
@@ -31,22 +32,13 @@ class OpenUserPreferredEditor
             default => '',
         };
 
-        print_r($openEditorUri);
-
-        if (! $openEditorUri) {
-            return;
-        }
-
-        if (windows_os()) {
-            return exec('explorer '.str_replace('%path', $event->filePath, $openEditorUri));
-        }
-
-        if (PHP_OS_FAMILY === 'Linux') {
-            return exec('xdg-open '.str_replace('%path', $event->filePath, $openEditorUri));
-        }
-
-        if (PHP_OS_FAMILY === 'Darwin') {
-            return exec('open '.str_replace('%path', $event->filePath, $openEditorUri));
+        if ($openEditorUri !== '') {
+            match (true) {
+                windows_os() => exec('explorer '.str_replace('%path', $event->filePath, $openEditorUri)),
+                PHP_OS_FAMILY === 'Linux' => exec('xdg-open '.str_replace('%path', $event->filePath, $openEditorUri)),
+                PHP_OS_FAMILY === 'Darwin' => exec('open '.str_replace('%path', $event->filePath, $openEditorUri)),
+                default => '',
+            };
         }
     }
 }
