@@ -15,4 +15,13 @@ class ByteUnitTest extends TestCase
 
         $this->assertEquals('1 KB', $file->size);
     }
+
+    public function testFileModelGetSizeAttributeCastedToByteUnitObjectWhenNull()
+    {
+        $file = new File(['size' => null]);
+
+        $this->assertIsString($file->size);
+
+        $this->assertEquals('0 B', $file->size);
+    }
 }

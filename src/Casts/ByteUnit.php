@@ -18,7 +18,7 @@ class ByteUnit implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        return (string) ByteUnitConverter::new($value)->nearestUnit();
+        return (string) ByteUnitConverter::new(!$value ? 0 : $value)->nearestUnit();
     }
 
     /**
