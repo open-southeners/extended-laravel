@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Mockery as m;
 use OpenSoutheners\ExtendedLaravel\Helpers;
 use Workbench\App\Models\Post;
@@ -162,11 +163,17 @@ class HelpersTest extends TestCase
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
-        $grammar = new $grammarClass;
+
+        $grammar = m::mock($grammarClass);
+        $grammar->shouldReceive('getBitwiseOperators')->andReturn([]);
+        $grammar->shouldReceive('compileSelect')->andReturn('');
+
         $processor = new $processorClass;
+
         $connection = m::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
-        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
-            return new BaseBuilder($connection, $grammar, $processor);
+
+        $connection->shouldReceive('query')->andReturnUsing(function () use ($connection) {
+            return new BaseBuilder($connection);
         });
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $connection->shouldReceive('getName')->andReturn('sqlite');
