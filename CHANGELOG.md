@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2025-10-20
+
+### Added
+
+- `config()->number()` method to get a numberic value from the config (also handles null values)
+- Add methods for all typed config methods (like `config()->stringish()`, `config()->integerish()`, etc) **will gracefully return default when the key is not found or the value is null**
+
 ## [0.6.1] - 2025-10-17
 
 ### Fixed
