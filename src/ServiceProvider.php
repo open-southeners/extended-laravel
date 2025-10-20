@@ -73,6 +73,7 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
+        \Illuminate\Config\Repository::mixin(new \OpenSoutheners\ExtendedLaravel\Config\Repository);
         \Illuminate\Support\Arr::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Arr);
         \Illuminate\Support\Str::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Str);
         \Illuminate\Support\Stringable::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Stringable);
