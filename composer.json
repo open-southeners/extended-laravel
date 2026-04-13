@@ -31,8 +31,8 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.0",
-        "laravel/cashier": "^15.0",
-        "laravel/passport": "^12.0",
+        "laravel/cashier": "^16.0",
+        "laravel/passport": "^13.0",
         "laravel/pint": "^1.5",
         "laravel/socialite": "^5.0",
         "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
@@ -55,7 +55,10 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "extra": {
         "laravel": {
