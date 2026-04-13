@@ -2,6 +2,7 @@
 
 namespace OpenSoutheners\ExtendedLaravel\Config;
 
+use Closure;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
@@ -13,7 +14,7 @@ use InvalidArgumentException;
  */
 class Repository
 {
-    public function stringish()
+    public function stringish(): Closure
     {
         /**
          * Get the specified string or null configuration value.
@@ -39,7 +40,7 @@ class Repository
         };
     }
 
-    public function integerish()
+    public function integerish(): Closure
     {
         /**
          * Get the specified integer or null configuration value.
@@ -65,7 +66,7 @@ class Repository
         };
     }
 
-    public function floatish()
+    public function floatish(): Closure
     {
         /**
          * Get the specified float or null configuration value.
@@ -91,7 +92,7 @@ class Repository
         };
     }
 
-    public function booleanish()
+    public function booleanish(): Closure
     {
         /**
          * Get the specified boolean or null configuration value.
@@ -117,7 +118,7 @@ class Repository
         };
     }
 
-    public function arrayish()
+    public function arrayish(): Closure
     {
         /**
          * Get the specified array or null configuration value.
@@ -143,21 +144,23 @@ class Repository
         };
     }
 
-    public function collectionish()
+    public function collectionish(): Closure
     {
         /**
          * Get the specified array configuration value as a collection.
          *
-         * @param  string  $key
-         * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
-         * @return Collection<array-key, mixed>
+        * @param  string  $key
+        * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+        * @return Collection<array-key, mixed>
          */
         return function (string $key, $default = null): Collection {
-            return new Collection($this->arrayish($key, $default) ?? []);
+            $value = $this->get($key, $default);
+
+            return new Collection(is_array($value) ? $value : []);
         };
     }
 
-    public function numeric()
+    public function numeric(): Closure
     {
         /**
          * Get the specified numeric or null configuration value.

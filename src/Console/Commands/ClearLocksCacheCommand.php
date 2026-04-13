@@ -4,7 +4,6 @@ namespace OpenSoutheners\ExtendedLaravel\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
@@ -40,10 +39,20 @@ class ClearLocksCacheCommand extends Command
         if ($cacheDriver === 'redis') {
             Redis::connection(config()->string('cache.stores.redis.lock_connection', 'default'))->flushDb();
         } elseif ($cacheDriver === 'database') {
-            $databaseCacheConfig = config()->array('cache.stores.database', 'default');
+            $lockConnection = config('cache.stores.database.lock_connection');
 
-            DB::connection($databaseCacheConfig['lock_connection'] ?? $databaseCacheConfig['connection'] ?? null)
-                ->table($databaseCacheConfig['lock_table'] ?? 'cache_locks')
+            if (! is_string($lockConnection)) {
+                $lockConnection = config('cache.stores.database.connection');
+            }
+
+            $lockTable = config('cache.stores.database.lock_table');
+
+            if (! is_string($lockTable)) {
+                $lockTable = 'cache_locks';
+            }
+
+            DB::connection(is_string($lockConnection) ? $lockConnection : null)
+                ->table($lockTable)
                 ->truncate();
         }
 

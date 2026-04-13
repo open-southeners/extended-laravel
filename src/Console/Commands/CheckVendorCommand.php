@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -47,30 +48,50 @@ class CheckVendorCommand extends Command
      */
     public function handle(): int
     {
+        /** @var array<string, string> $packagesArr */
         $packagesArr = ServiceProvider::pathsToPublish();
+        /** @var list<array{from: string, from_path: string, fullpath: string, path: string, last_updated: string}> $publishablesArr */
         $publishablesArr = [];
 
         foreach ($packagesArr as $origin => $destination) {
             if (is_dir($origin)) {
-                $originFiles = $this->filesystem->allFiles(str_replace(trim(base_path(' ')), '', $origin));
+                $originPath = $this->getPathForStorage($origin);
+                $originFiles = $this->filesystem->allFiles($originPath);
 
                 foreach ($originFiles as $file) {
-                    $publishablesArr[] = $this->getFileDiff($file, base_path(last(explode($origin, $file))));
+                    $relativeFilePath = Str::after($file, $originPath.'/');
+                    $publishable = $this->getFileDiff(
+                        base_path($file),
+                        rtrim($destination, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$relativeFilePath,
+                    );
+
+                    if ($publishable !== []) {
+                        $publishablesArr[] = $publishable;
+                    }
                 }
             } else {
-                $publishablesArr[] = $this->getFileDiff($origin, $destination);
+                $publishable = $this->getFileDiff($origin, $destination);
+
+                if ($publishable !== []) {
+                    $publishablesArr[] = $publishable;
+                }
             }
         }
 
-        $publishablesArr = array_filter($publishablesArr);
         $headers = ['from_path', 'path', 'last_updated'];
 
-        $this->table(array_map('strtoupper', $headers), array_map(fn ($val) => Arr::only($val, $headers), $publishablesArr));
+        $this->table(
+            array_map('strtoupper', $headers),
+            array_map(fn (array $publishable): array => Arr::only($publishable, $headers), $publishablesArr)
+        );
 
         return 0;
     }
 
-    protected function getFileDiff($origin, $destination)
+    /**
+     * @return array{from: string, from_path: string, fullpath: string, path: string, last_updated: string}|array{}
+     */
+    protected function getFileDiff(string $origin, string $destination): array
     {
         $originPath = $this->getPathForStorage($origin);
         $destinationPath = $this->getPathForStorage($destination);
@@ -102,8 +123,8 @@ class CheckVendorCommand extends Command
         return [];
     }
 
-    protected function getPathForStorage($path)
+    protected function getPathForStorage(string $path): string
     {
-        return str_replace(trim(base_path(' ')), '', (string) $path);
+        return ltrim(Str::after($path, base_path()), DIRECTORY_SEPARATOR);
     }
 }

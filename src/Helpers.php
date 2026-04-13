@@ -2,6 +2,7 @@
 
 namespace OpenSoutheners\ExtendedLaravel;
 
+use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -10,10 +11,6 @@ use Illuminate\Support\Str;
 use ReflectionClass;
 use Spatie\StructureDiscoverer\Data\DiscoveredClass;
 use Spatie\StructureDiscoverer\Discover;
-use Throwable;
-
-use function OpenSoutheners\ExtendedPhp\Classes\call;
-use function OpenSoutheners\ExtendedPhp\Classes\class_from;
 
 class Helpers
 {
@@ -48,20 +45,18 @@ class Helpers
 
     /**
      * Check if object or class string is a valid Laravel model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|object|class-string  $class
      */
     public static function isModel(mixed $class): bool
     {
-        if (! $class) {
+        if (! is_object($class) && ! is_string($class)) {
             return false;
         }
 
-        try {
-            $classReflection = new ReflectionClass($class);
-        } catch (Throwable $e) {
+        if ($class === '' || (is_string($class) && ! class_exists($class))) {
             return false;
         }
+
+        $classReflection = new ReflectionClass($class);
 
         return $classReflection->isInstantiable()
             && $classReflection->isSubclassOf('Illuminate\Database\Eloquent\Model');
@@ -70,40 +65,40 @@ class Helpers
     /**
      * Get model instance from a mix-typed parameter.
      *
-     * @template T of \Illuminate\Database\Eloquent\Model
-     *
-     * @param  T|int|null  $key
-     * @param  class-string<T>|string  $class
-     * @param  array<string>  $columns
-     * @param  array<string>  $with
-     * @return T|null
+     * @param  \Illuminate\Database\Eloquent\Model|int|null  $key
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>|string  $class
+     * @param  list<string>  $columns
+     * @param  list<string>  $with
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
     public static function instanceFrom(mixed $key, string $class, array $columns = ['*'], array $with = [], bool $enforce = false)
     {
-        if (! \class_exists($class) || ! static::isModel($class) || (\is_object($key) && ! static::isModel($key))) {
-            throw (new ModelNotFoundException)->setModel($class);
+        $modelClass = static::resolveModelClass($class);
+
+        if (is_object($key) && ! static::isModel($key)) {
+            throw new ModelNotFoundException;
         }
 
-        if (static::isModel($key) && $enforce) {
-            /** @var T $key */
+        if ($key instanceof $modelClass && $enforce) {
             return $key->loadMissing($with);
         }
 
-        return static::queryFrom($class)->with($with)->whereKey($key)->first($columns);
+        $model = static::newModelInstance($modelClass);
+
+        return $model->newQuery()->with($with)->whereKey($key)->first($columns);
     }
 
     /**
      * Get key (id) from a mix-typed parameter.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $model
      */
-    public static function keyFrom($model): mixed
+    public static function keyFrom(mixed $model): mixed
     {
         if (is_numeric($model)) {
             return (int) $model;
         }
 
-        if (is_object($model) && method_exists($model, 'getKey')) {
+        if ($model instanceof Model) {
             return $model->getKey();
         }
 
@@ -117,17 +112,21 @@ class Helpers
     /**
      * Get a new query instance from model or class string.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|class-string|string|object  $model
-     * @return \Illuminate\Database\Eloquent\Builder|false
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|class-string<\Illuminate\Database\Eloquent\Model>|object|string  $model
+     * @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|false
      */
-    public static function queryFrom($model)
+    public static function queryFrom(mixed $model): Builder|false
     {
-        if (\class_exists(class_from($model)) && \method_exists($model, 'newQuery')) {
-            return call($model, 'newQuery');
+        if ($model instanceof Builder) {
+            return $model->newModelInstance()->newQuery();
         }
 
-        if ($model instanceof Builder) {
-            return call($model, 'newModelInstance.newQuery');
+        if ($model instanceof Model) {
+            return $model->newQuery();
+        }
+
+        if (is_string($model) && static::isModelClass($model)) {
+            return (new $model)->newQuery();
         }
 
         return false;
@@ -135,20 +134,85 @@ class Helpers
 
     /**
      * Get lock owner by key or false if lock not existing.
+     *
+     * @return array<string>|string|false
      */
     public static function getCacheLockOwner(string $key = '*'): array|string|false
     {
-        $lockClient = Cache::lockConnection()->client();
+        $store = Cache::getStore();
 
-        if (Str::contains($key, '*')) {
-            return Str::replace(
-                // TODO: Is there any other way to get this from Cache, CacheManager, Lock or Redis?
-                config('database.redis.locks.prefix', '') . Cache::getPrefix(),
-                '',
-                $lockClient->keys(Cache::getPrefix() . $key),
-            );
+        if (! $store instanceof RedisStore) {
+            return false;
         }
 
-        return $lockClient->get(Cache::getPrefix() . $key);
+        $lockClient = $store->lockConnection()->client();
+
+        if (! is_object($lockClient) || ! method_exists($lockClient, 'keys') || ! method_exists($lockClient, 'get')) {
+            return false;
+        }
+
+        $prefix = config()->string('database.redis.locks.prefix', '').Cache::getPrefix();
+
+        if (Str::contains($key, '*')) {
+            $keys = $lockClient->keys(Cache::getPrefix().$key);
+
+            if (! is_iterable($keys)) {
+                return false;
+            }
+
+            $owners = [];
+
+            foreach ($keys as $lockKey) {
+                if (is_string($lockKey) || is_int($lockKey) || is_float($lockKey)) {
+                    $owners[] = Str::replace($prefix, '', (string) $lockKey);
+                }
+            }
+
+            return $owners;
+        }
+
+        $owner = $lockClient->get(Cache::getPrefix().$key);
+
+        if (is_string($owner) || $owner === false) {
+            return $owner;
+        }
+
+        if (is_int($owner) || is_float($owner)) {
+            return (string) $owner;
+        }
+
+        return false;
+    }
+
+    /**
+     * @phpstan-assert-if-true class-string<Model> $class
+     */
+    protected static function isModelClass(string $class): bool
+    {
+        return class_exists($class) && static::isModel($class);
+    }
+
+    /**
+     * @param  class-string<Model>|string  $class
+     * @return class-string<Model>
+     */
+    protected static function resolveModelClass(string $class): string
+    {
+        if (! static::isModelClass($class)) {
+            throw new ModelNotFoundException;
+        }
+
+        return $class;
+    }
+
+    /**
+     * @template T of Model
+     *
+     * @param  class-string<T>  $class
+     * @return T
+     */
+    protected static function newModelInstance(string $class): Model
+    {
+        return new $class;
     }
 }

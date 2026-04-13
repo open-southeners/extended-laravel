@@ -93,13 +93,17 @@ class LicensesVendorCommand extends Command
      */
     protected function fetchNodeDependencies(): Collection
     {
+        if (! file_exists(base_path('package.json'))) {
+            return Collection::make();
+        }
+
         $command = ['npx', 'license-report'];
 
         if ($this->option('prod')) {
             $command[] = '--only=prod';
         }
 
-        $result = Process::run(implode(' ', $command));
+        $result = Process::run($command);
 
         /** @var array<array{'name': string, 'licenseType': string}>|bool|null $parsedResult */
         $parsedResult = json_decode($result->output(), true);
@@ -126,13 +130,13 @@ class LicensesVendorCommand extends Command
             $command[] = '--no-dev';
         }
 
-        $result = Process::run(implode(' ', $command));
+        $result = Process::run($command);
 
         /** @var array{'dependencies': array<string, array{'license': array<string>}>}|bool|null $parsedResult */
         $parsedResult = json_decode($result->output(), true);
 
         return Collection::make(is_array($parsedResult) ? $parsedResult['dependencies'] : [])
-            ->map(fn(array $dependency, string $name) => ['Component' => $name, 'License' => implode(', ', $dependency['license'])])
+            ->map(fn (array $dependency, string $name): array => ['Component' => $name, 'License' => implode(', ', $dependency['license'])])
             ->values();
     }
 }

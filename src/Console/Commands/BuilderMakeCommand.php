@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use OpenSoutheners\ExtendedLaravel\Console\Concerns\OpensGeneratedFiles;
 use OpenSoutheners\ExtendedLaravel\Helpers;
 use ReflectionClass;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 
 class BuilderMakeCommand extends GeneratorCommand
@@ -60,10 +61,19 @@ class BuilderMakeCommand extends GeneratorCommand
     protected function writeModelBuilder()
     {
         $model = $this->argument('name');
+        $modelClass = Helpers::modelFrom($model);
 
-        $reflection = new ReflectionClass(Helpers::modelFrom($model));
+        if (! is_string($modelClass)) {
+            throw new RuntimeException(sprintf('Unable to resolve model [%s].', $model));
+        }
+
+        $reflection = new ReflectionClass($modelClass);
 
         $modelFilePath = $reflection->getFileName();
+
+        if (! is_string($modelFilePath)) {
+            throw new RuntimeException(sprintf('Unable to resolve file path for model [%s].', $modelClass));
+        }
 
         $modelContents = $this->files->get($modelFilePath);
 
@@ -123,7 +133,7 @@ EOT;
     /**
      * Get the console command arguments.
      *
-     * @return array
+     * @return array<int, array{string, int, string}>
      */
     protected function getArguments()
     {
