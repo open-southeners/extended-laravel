@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-08-12
+
+### Fixed
+
+- Overridden generator commands (`make:policy`, `make:controller`, etc.) no longer conflict with other packages, like Laravel Nova, that extend the same base Artisan command classes. Previously this could crash Artisan with a duplicate command registration error when both packages were installed together.
+
 ## [0.8.0] - 2026-04-13
 
 ### Added

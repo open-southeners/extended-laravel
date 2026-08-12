@@ -2,19 +2,27 @@
 
 namespace OpenSoutheners\ExtendedLaravel;
 
+use Illuminate\Config\Repository;
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
-use Illuminate\Foundation\Application;
+use Illuminate\Console\Command;
+use Illuminate\Console\GeneratorCommand;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Events\PublishingStubs;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
+use Illuminate\Validation\Rule;
 use OpenSoutheners\ExtendedLaravel\Console\Commands;
-use OpenSoutheners\ExtendedLaravel\Events;
-use OpenSoutheners\ExtendedLaravel\Listeners;
 
 class ServiceProvider extends BaseServiceProvider
 {
     /**
-     * @var array<string, class-string<\Illuminate\Console\GeneratorCommand>>
+     * @var array<string, class-string<GeneratorCommand>>
      */
     private array $overrides = [
         'command.cast.make' => Commands\CastMakeCommand::class,
@@ -56,7 +64,7 @@ class ServiceProvider extends BaseServiceProvider
         AboutCommandIntegration::register();
 
         Event::listen(
-            \Illuminate\Foundation\Events\PublishingStubs::class,
+            PublishingStubs::class,
             Listeners\RegisterStubs::class
         );
 
@@ -73,26 +81,36 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        \Illuminate\Config\Repository::mixin(new \OpenSoutheners\ExtendedLaravel\Config\Repository);
-        \Illuminate\Support\Arr::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Arr);
-        \Illuminate\Support\Str::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Str);
-        \Illuminate\Support\Stringable::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Stringable);
-        \Illuminate\Support\Number::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Number);
-        \Illuminate\Support\Facades\Storage::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Storage);
-        \Illuminate\Support\Collection::mixin(new \OpenSoutheners\ExtendedLaravel\Support\Collection);
-        \Illuminate\Events\Dispatcher::mixin(new \OpenSoutheners\ExtendedLaravel\Events\Dispatcher);
-        \Illuminate\Validation\Rule::mixin(new \OpenSoutheners\ExtendedLaravel\Validation\Rule);
+        Repository::mixin(new Config\Repository);
+        Arr::mixin(new Support\Arr);
+        Str::mixin(new Support\Str);
+        Stringable::mixin(new Support\Stringable);
+        Number::mixin(new Support\Number);
+        Storage::mixin(new Support\Storage);
+        Collection::mixin(new Support\Collection);
+        Dispatcher::mixin(new Events\Dispatcher);
+        Rule::mixin(new Validation\Rule);
 
         // Laravel replacements to get the modified with OpensGeneratedFiles trait
-        $this->app->booted(function() {
-			Artisan::starting(function() {
-                $this->app->singleton(MigrateMakeCommand::class, function(Application $app) {
-                    return new Commands\MigrateMakeCommand($app['migration.creator'], $app['composer']);
-                });
+        $this->app->booted(function () {
+            Artisan::starting(function (Artisan $artisan) {
+                // Laravel (and packages like Nova, which registers its own `nova:policy` etc.
+                // commands) resolve generator commands through the base Laravel class itself as
+                // the container abstract, so rebinding that abstract to our override fights any
+                // other package doing the same thing for that class and can leave Artisan with
+                // conflicting command registrations. Instead, we add our replacement command
+                // directly to the console application under its existing name (e.g. `make:policy`),
+                // which cleanly replaces Laravel's own registration without touching the shared
+                // class binding that other packages depend on.
+                $artisan->add(new Commands\MigrateMakeCommand(
+                    $this->app->make('migration.creator'),
+                    $this->app->make('composer')
+                ));
 
                 foreach ($this->overrides as $abstract => $override) {
                     $this->app->singleton($abstract, $override);
-                    $this->app->singleton(get_parent_class($override), $override);
+
+                    $artisan->add($this->resolveOverrideCommand($override));
                 }
             });
         });
@@ -105,5 +123,19 @@ class ServiceProvider extends BaseServiceProvider
             Commands\FlushHorizonCommand::class,
             Commands\LicensesVendorCommand::class,
         ]);
+    }
+
+    /**
+     * @param  class-string<GeneratorCommand>  $override
+     */
+    private function resolveOverrideCommand(string $override): Command
+    {
+        $command = $this->app->make($override);
+
+        if (! $command instanceof Command) {
+            throw new \RuntimeException("Expected [{$override}] to resolve to an Artisan command instance.");
+        }
+
+        return $command;
     }
 }
